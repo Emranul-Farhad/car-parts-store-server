@@ -3,6 +3,8 @@ const app = express()
 const port = process.env.PORT || 8000
 var cors = require('cors')
 require('dotenv').config()
+var jwt = require('jsonwebtoken');
+
 
 // cors midelware / express midelware
 app.use(cors())
@@ -28,8 +30,9 @@ async function run() {
 
 
         //  user collection make heree
-        app.put('/users/:email' , async(req,res)=> {
-            const email = req.query.email;
+        app.put('/users/:email', async(req,res)=> {
+            const email = req.params.email;
+            console.log(email);
             const info = req.body ;
             const filter = {email : email}
             const options = { upsert: true };
@@ -38,9 +41,13 @@ async function run() {
               };
 
               const updateuser = await usercollection.updateOne(filter, updateDoc, options)
-              res.send(updateuser)
+              const token = jwt.sign({email : email },  process.env.JWT_KEY );
+              res.send({updateuser, token })
         })
+
+        // admin make api creation
          
+
 
 
     }
