@@ -23,12 +23,29 @@ async function run() {
 
         // mongodb collection
         await client.connect()
-        const collection = client.db("customer").collection("users");
+        const usercollection = client.db("customer").collection("users");
+  
 
+
+        //  user collection make heree
+        app.put('/users/:email' , async(req,res)=> {
+            const email = req.query.email;
+            const info = req.body ;
+            const filter = {email : email}
+            const options = { upsert: true };
+            const updateDoc = {
+                $set:  info  
+              };
+
+              const updateuser = await usercollection.updateOne(filter, updateDoc, options)
+              res.send(updateuser)
+        })
          
 
 
     }
+
+    // catch start from here
     catch {
 
     }
