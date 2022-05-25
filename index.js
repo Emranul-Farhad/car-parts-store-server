@@ -104,6 +104,8 @@ async function run() {
           res.send(addproducts)
       } )
 
+    //   manaeg all products
+    
 
 
         // app.post('/doctors', verrifyjwt, verifyadmin, async(req,res)=> {
