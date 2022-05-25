@@ -4,7 +4,7 @@ const port = process.env.PORT || 8000
 var cors = require('cors')
 require('dotenv').config()
 var jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
 
 // cors midelware / express midelware
 app.use(cors())
@@ -48,6 +48,7 @@ async function run() {
         const usercollection = client.db("customer").collection("users");
         const allproducts = client.db("products").collection("All products");
         const ordersproducts = client.db("Allorder").collection("order");
+        const reviewscollection = client.db("Reviews").collection("Review");
 
 
         // all products section wotking below
@@ -74,7 +75,7 @@ async function run() {
             res.send(orderget)
         })
 
-        // orders grt from db email wise user 
+        // orders get from db email wise user 
         app.get('/orders', verrifyjwt, async (req, res) => {
             const email = req.query.email
             const decoded = req.decoded.email;
@@ -112,7 +113,7 @@ async function run() {
         //  user collection make heree
         app.put('/users/:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email);
+        
             const info = req.body;
             const filter = { email: email }
             const options = { upsert: true };
@@ -131,20 +132,41 @@ async function run() {
         })
 
         // admin make api creation
-        app.put('/users/admin/:email', async(req, res) => {
+        app.put('/users/admin/:email',   verrifyjwt, async(req, res) => {
             const email = req.params.email;
-            const filter = { email: email}
-            const updateDoc = {
-                $set: { role: "admin" }
+            const requester = req.decoded.email ;
+            const adminsrequester = await usercollection.findOne({email : requester})
+            if (adminsrequester.role === "admin" ){
+                const filter = { email: email}
+                const updateDoc = {
+                    $set: { role: "admin" }
+                }
+                const makeuser = await usercollection.updateOne(filter , updateDoc)
+                res.send(makeuser)
             }
-            const makeuser = await usercollection.updateOne(filter , updateDoc)
-            res.send(makeuser)
+           else {
+               return res.status(403).send({message: "unaucthorized access"})
+           }
         })
 
+        // admin privatre route only admin can access this api's route
+        app.get('/users/:email', async(req,res)=> {
+            const email = req.params.email ;
+            console.log(email, "admin check");
+            const checkemail = await usercollection.findOne({email : email})
+            const aftercheck = checkemail.role === 'admin'
+            res.send({admin : aftercheck})
+        } )
 
+        // review api make
+        app.post('/reviews', async(req,res)=> {
+            const reviews = req.body ;
+            console.log(reviews, "reviews got from here");
+            const reviewcollections = await  reviewscollection.insertOne(reviews)
+            res.send(reviewcollections)
+        } )
 
-
-
+        // get review api from data base
 
 
         
