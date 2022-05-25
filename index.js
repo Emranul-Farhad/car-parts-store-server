@@ -167,6 +167,10 @@ async function run() {
         } )
 
         // get review api from data base
+        app.get('/reviews', async(req,res)=> {
+            const getreviews = await reviewscollection.find().toArray()
+            res.send(getreviews)
+        } )
 
 
         
