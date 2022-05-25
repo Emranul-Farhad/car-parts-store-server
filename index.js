@@ -53,7 +53,7 @@ async function run() {
 
         // all products section wotking below
 
-        // products get api
+        // products get api for only admin can see
         app.get('/products', async (req, res) => {
             const myproducts = await allproducts.find().toArray()
             res.send(myproducts)
@@ -88,11 +88,21 @@ async function run() {
             else {
                 return res.status(403).send({ message: "foirbidden access" })
             }
-
         })
 
+        // get all order for manage
+        app.get('/allorders', async(req, res)=> {
+            const allorder = await ordersproducts.find().toArray()
+            res.send(allorder)
+        } )
 
-
+    //    add products in db
+      app.post('/addproducts' , async(req,res)=> {
+          const products = req.body
+          console.log(products);
+          const addproducts = await allproducts.insertOne(products)
+          res.send(addproducts)
+      } )
 
 
 
@@ -167,11 +177,12 @@ async function run() {
         } )
 
         // get review api from data base
-        app.get('/reviews', async(req,res)=> {
+        app.get('/reviews', verrifyjwt, async(req,res)=> {
             const getreviews = await reviewscollection.find().toArray()
             res.send(getreviews)
         } )
-
+        
+        
 
         
 
