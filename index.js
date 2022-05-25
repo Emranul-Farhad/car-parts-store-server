@@ -19,6 +19,44 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 
+// verify jwt midelware
+
+const verrifyjwt = (req,res,next)=> {
+    const auth = req.headers.authorization;
+    if (!auth){
+        return res.status(403).send({Message : "unathorized access"})
+    }
+    const token = auth.split(" ")[1]
+    jwt.verify(token, process.env.JWT_KEY , function(err, decoded){
+        if(err){
+          return res.status(401).send({message : "forbidden access" })
+        }
+        console.log( "decoded", decoded);
+        req.decoded = decoded
+      })
+
+    next()
+}
+
+
+
+// function verrifyjwt (req,res,next){
+//     const tokengetfromclient = req.headers.authorization
+//     if(!tokengetfromclient){
+//       return res.status(403).send({massage : "unauthorized access"})
+//     }
+//     const token = tokengetfromclient.split(" ")[1];
+    
+//     jwt.verify(token, process.env.JWT_SECRET , function(err, decoded){
+//       if(err){
+//         return res.status(401).send({message : "forbidden access" })
+//       }
+//       // console.log( "decoded", decoded);
+//       req.decoded = decoded
+//     })
+//     next();
+//    }
+
 async function run() {
 
     try {
@@ -53,14 +91,20 @@ async function run() {
             res.send(orderget)
         } )
 
-        // orders grt from db
-        app.get('/orders' , async(req,res)=> {
+        // orders grt from db email wise user 
+        app.get('/orders' , verrifyjwt, async(req,res)=> {
         const email = req.query.email 
-        console.log(email);
-        const query = {email:email}
-        console.log(query);
-        const myorders = await ordersproducts.find(query).toArray()
-            res.send(myorders)
+        const decoded = req.decoded.email ;
+        if(email === decoded){
+            const query = {email:email}
+            console.log(query);
+            const myorders = await ordersproducts.find(query).toArray()
+                res.send(myorders)
+        }
+        else{
+            return res.status(403).send({message : "foirbidden access"})
+        }
+       
         })
 
        
@@ -93,7 +137,7 @@ async function run() {
                 $set:  info  
               };
               const updateuser = await usercollection.updateOne(filter, updateDoc, options)
-              const token = jwt.sign({email : email },  process.env.JWT_KEY );
+              const token = jwt.sign({email : email },  process.env.JWT_KEY  , { expiresIn: '2d' });
               res.send({updateuser, token })
         })
 
