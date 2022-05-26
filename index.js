@@ -104,18 +104,25 @@ async function run() {
           res.send(addproducts)
       } )
 
-    //   manaeg all products
+    //  delet products
+    app.delete('/products/:id' , async(req,res)=> {
+        const id = req.params.id ;
+        console.log(id);
+        const filter = {_id: ObjectId(id)}
+        console.log(filter);
+        const deleted = await allproducts.deleteOne(filter)
+        res.send(deleted)
+    } )
     
 
 
-        // app.post('/doctors', verrifyjwt, verifyadmin, async(req,res)=> {
-        //     const doctors = req.body;
-        //     console.log(req.body)
-        //     const getinfo = await doctorsformation.insertOne(doctors)
-        //     res.send(getinfo)
-        //   })
-
-
+    
+    // app.delete('/doctors/:name', async(req,res)=> {
+    //     const name = req.params.name;    
+    //     const filter = {name : name}
+    //     const doctorsinfo = await doctorsformation.deleteOne(filter)
+    //     res.send(doctorsinfo)
+    //   })
 
 
 
