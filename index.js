@@ -5,7 +5,7 @@ var cors = require('cors')
 require('dotenv').config()
 var jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
-const stripe = require("stripe")(process.env.STRIPE_KEY);
+// const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 
 
@@ -222,20 +222,20 @@ async function run() {
         
 
         // payment information
-        app.post("/create-payment-intent", async (req, res)=> {
-            const price = req.body ;
-            const amounts = price.price;
-            console.log(amounts)
-            // const prices = {price: price.price}
-            const amount = amounts*100 ;
-            console.log(amount);
-            const paymentIntent = await stripe.paymentIntents.create({
-              amount: amount,
-              currency: 'usd',
-              payment_method_types: ['card']     
-            });
-            res.send({clientSecret: paymentIntent.client_secret});
-          })
+        // app.post("/create-payment-intent", async (req, res)=> {
+        //     const price = req.body ;
+        //     const amounts = price.price;
+        //     console.log(amounts)
+        //     // const prices = {price: price.price}
+        //     const amount = amounts*100 ;
+        //     console.log(amount);
+        //     const paymentIntent = await stripe.paymentIntents.create({
+        //       amount: amount,
+        //       currency: 'usd',
+        //       payment_method_types: ['card']     
+        //     });
+        //     res.send({clientSecret: paymentIntent.client_secret});
+        //   })
 
 
       //  profile update
@@ -257,19 +257,7 @@ async function run() {
         } )
        
 
-        // app.get('/orders', verrifyjwt, async (req, res) => {
-        //     const email = req.query.email
-        //     const decoded = req.decoded.email;
-        //     if (email === decoded) {
-        //         const query = { email: email }
-        //         console.log(query);
-        //         const myorders = await ordersproducts.find(query).toArray()
-        //         res.send(myorders)
-        //     }
-        //     else {
-        //         return res.status(403).send({ message: "foirbidden access" })
-        //     }
-        // })
+        
 
 
 
