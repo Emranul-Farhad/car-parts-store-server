@@ -5,6 +5,9 @@ var cors = require('cors')
 require('dotenv').config()
 var jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
+const stripe = require("stripe")(process.env.STRIPE_KEY);
+
+
 
 // cors midelware / express midelware
 app.use(cors())
@@ -49,6 +52,7 @@ async function run() {
         const allproducts = client.db("products").collection("All products");
         const ordersproducts = client.db("Allorder").collection("order");
         const reviewscollection = client.db("Reviews").collection("Review");
+        const profiles = client.db("profile").collection("info");
 
 
         // all products section wotking below
@@ -75,7 +79,7 @@ async function run() {
             res.send(orderget)
         })
 
-        // orders get from db email wise user 
+        // orders get from db email wise user  user wise my order page
         app.get('/orders', verrifyjwt, async (req, res) => {
             const email = req.query.email
             const decoded = req.decoded.email;
@@ -107,23 +111,47 @@ async function run() {
     //  delet products
     app.delete('/products/:id' , async(req,res)=> {
         const id = req.params.id ;
-        console.log(id);
         const filter = {_id: ObjectId(id)}
-        console.log(filter);
         const deleted = await allproducts.deleteOne(filter)
         res.send(deleted)
     } )
     
-
+//    id wise informartion get for payment
+      app.get('/payment/:id' , async(req, res)=> {
+          const id = req.params.id
+          console.log(id);
+          const query = {_id : ObjectId(id)}
+          const idwiseonformation = await ordersproducts.findOne(query)
+          res.send(idwiseonformation)
+      } )
 
     
-    // app.delete('/doctors/:name', async(req,res)=> {
-    //     const name = req.params.name;    
-    //     const filter = {name : name}
-    //     const doctorsinfo = await doctorsformation.deleteOne(filter)
-    //     res.send(doctorsinfo)
-    //   })
 
+    //  products update after order
+    //   app.get('/available', async(req,res)=> {
+    //       const order = req.query.order
+
+    //       const orderdproducts = await ordersproducts.find(query).toArray()
+
+    //       const all = await allproducts.find().toArray()
+
+    //       const query = {order : order}
+
+    //       all.forEach(products => {
+    //           const products = orderdproducts.filter(order => order.pname ===  orderdproducts.productname)
+    //           const orderquantity = 
+
+    //       })
+          
+
+
+          
+    //       res.send(all)
+    //   } )
+
+
+
+   
 
 
 
@@ -193,14 +221,62 @@ async function run() {
         
         
 
-        
+        // payment information
+        app.post("/create-payment-intent", async (req, res)=> {
+            const price = req.body ;
+            const amounts = price.price;
+            console.log(amounts)
+            // const prices = {price: price.price}
+            const amount = amounts*100 ;
+            console.log(amount);
+            const paymentIntent = await stripe.paymentIntents.create({
+              amount: amount,
+              currency: 'usd',
+              payment_method_types: ['card']     
+            });
+            res.send({clientSecret: paymentIntent.client_secret});
+          })
 
 
+      //  profile update
+        app.post('/profile' , async(req,res)=> {
+            const profile = req.body ;
+            const profileinfo = await profiles.insertOne(profile)
+            res.send(profileinfo)
+        } )
 
+        // get update profile info
+        app.get('/profile', async(req,res)=> {
+            const email = req.query.email ;
+            console.log(email);
+            const query = {email: email}
+            console.log(query);
+            const updateprofile = await profiles.findOne(query)
+            res.send(updateprofile)
+
+        } )
+       
+
+        // app.get('/orders', verrifyjwt, async (req, res) => {
+        //     const email = req.query.email
+        //     const decoded = req.decoded.email;
+        //     if (email === decoded) {
+        //         const query = { email: email }
+        //         console.log(query);
+        //         const myorders = await ordersproducts.find(query).toArray()
+        //         res.send(myorders)
+        //     }
+        //     else {
+        //         return res.status(403).send({ message: "foirbidden access" })
+        //     }
+        // })
 
 
 
     }
+
+
+
 
     // catch start from here
     catch {
