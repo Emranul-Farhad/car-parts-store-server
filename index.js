@@ -56,7 +56,7 @@ async function run() {
         const usercollection = client.db("customer").collection("users");
         const allproducts = client.db("products").collection("All products");
         const ordersproducts = client.db("Allorder").collection("order");
-        const reviewscollection = client.db("Reviews").collection("Review");
+        const reviewscollection = client.db("Review").collection("Reviews");
         const profiles = client.db("profile").collection("info");
 
 
@@ -217,7 +217,7 @@ async function run() {
         } )
 
         // get review api from data base
-        app.get('/reviews', verrifyjwt, async(req,res)=> {
+        app.get('/reviews', async(req,res)=> {
             const getreviews = await reviewscollection.find().toArray()
             res.send(getreviews)
         } )
