@@ -139,12 +139,10 @@ async function run() {
 
     //       all.forEach(products => {
     //           const products = orderdproducts.filter(order => order.pname ===  orderdproducts.productname)
-    //           const orderquantity = 
-
-    //       })
-          
+    //           const orderquantity = products.map(product => orderquantity)
 
 
+    //       }
           
     //       res.send(all)
     //   } )
