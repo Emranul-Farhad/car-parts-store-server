@@ -12,9 +12,8 @@ const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
 // cors midelware / express midelware
 app.use(
     cors({
-      origin: true,
-      optionsSuccessStatus: 200,
-      credentials: true,
+      origin: "https://apar-motors.web.app",
+      
     })
   );
 app.use(express.json())
