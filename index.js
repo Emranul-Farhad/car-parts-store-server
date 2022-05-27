@@ -10,7 +10,13 @@ const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
 
 
 // cors midelware / express midelware
-app.use(cors())
+app.use(
+    cors({
+      origin: true,
+      optionsSuccessStatus: 200,
+      credentials: true,
+    })
+  );
 app.use(express.json())
 
 
@@ -166,7 +172,7 @@ async function run() {
                 $set: info
             };
             const updateuser = await usercollection.updateOne(filter, updateDoc, options)
-            const token = jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: '2d' });
+            const token = jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: '30d' });
             res.send({ updateuser, token })
         })
 
