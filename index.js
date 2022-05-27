@@ -12,8 +12,7 @@ const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
 // cors midelware / express midelware
 app.use(
     cors({
-      origin: "https://apar-motors.web.app",
-      
+    //   origin: "https://apar-motors.web.app", 
     })
   );
 app.use(express.json())
@@ -121,6 +120,16 @@ async function run() {
         res.send(deleted)
     } )
     
+    //  orders products delet
+    app.delete('/orderpro/:id' , async(req,res)=>{
+        const id = req.params.id;
+        console.log(id, "delet orders");
+        const filter = {_id: ObjectId(id)}
+        const deletorderproduct = await ordersproducts.deleteOne(filter)
+        res.send(deletorderproduct)
+    } )
+  
+
 //    id wise informartion get for payment
       app.get('/payment/:id' , async(req, res)=> {
           const id = req.params.id
@@ -166,7 +175,7 @@ async function run() {
         
             const info = req.body;
             const filter = { email: email }
-            const options = { upsert: true };
+            const options = { upsert: true};
             const updateDoc = {
                 $set: info
             };
@@ -182,8 +191,10 @@ async function run() {
         })
 
         // admin make api creation
-        app.put('/users/admin/:email',   verrifyjwt, async(req, res) => {
+        // verrifyjwt,
+        app.put('/users/admin/:email', verrifyjwt,  async(req, res) => {
             const email = req.params.email;
+            console.log(email , "jwt check for admin");
             const requester = req.decoded.email ;
             const adminsrequester = await usercollection.findOne({email : requester})
             if (adminsrequester.role === "admin" ){
